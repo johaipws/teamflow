@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import API from '../api/axios'
+import { connectNotificationStream } from '../api/notificationStream'
 
 function RealtimeNotifications() {
   const [toast, setToast] = useState(null)
@@ -15,21 +16,18 @@ function RealtimeNotifications() {
     async function connect() {
       const response = await API.get('/notifications')
       const latestId = response.data[0]?.id || 0
-      const tokenResponse = await API.post('/notifications/stream-token')
-      const token = tokenResponse.data.token
-      const apiBase = import.meta.env.VITE_API_URL || '/api'
-      const url = `${apiBase}/notifications/stream?token=${encodeURIComponent(token)}&after=${latestId}`
-      source = new EventSource(url)
-      source.addEventListener('notification', event => {
-        const notification = JSON.parse(event.data)
+      source = await connectNotificationStream({
+        after: latestId,
+        onNotification: notification => {
         setToast(notification)
         clearTimeout(closeTimer)
         closeTimer = setTimeout(() => setToast(null), 7000)
+        },
+        onError: () => {
+          source?.close()
+          if (!stopped) reconnectTimer = setTimeout(connect, 3000)
+        },
       })
-      source.onerror = () => {
-        source.close()
-        if (!stopped) reconnectTimer = setTimeout(connect, 3000)
-      }
     }
 
     connect().catch(console.error)

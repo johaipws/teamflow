@@ -1,17 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import API from '../api/axios'
+import { connectNotificationStream } from '../api/notificationStream'
 
 function Notifications() {
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [channels, setChannels] = useState(null)
+  const latestIdRef = useRef(0)
   const navigate = useNavigate()
   async function refresh() {
     try {
       const response = await API.get('/notifications')
       setItems(response.data)
+      latestIdRef.current = response.data[0]?.id || 0
       setError('')
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Notifications could not be loaded')
@@ -20,6 +23,36 @@ function Notifications() {
     }
   }
   useEffect(() => { refresh() }, [])
+
+  useEffect(() => {
+    let source
+    let reconnectTimer
+    let stopped = false
+
+    async function connect() {
+      source = await connectNotificationStream({
+        after: latestIdRef.current,
+        onNotification: notification => {
+          latestIdRef.current = Math.max(latestIdRef.current, notification.id)
+          setItems(current => {
+            if (current.some(item => item.id === notification.id)) return current
+            return [notification, ...current]
+          })
+        },
+        onError: () => {
+          source?.close()
+          if (!stopped) reconnectTimer = setTimeout(connect, 3000)
+        },
+      })
+    }
+
+    if (!loading) connect().catch(() => setError('Real-time notification updates disconnected'))
+    return () => {
+      stopped = true
+      source?.close()
+      clearTimeout(reconnectTimer)
+    }
+  }, [loading])
 
   useEffect(() => {
     API.get('/notifications/channels').then(response => setChannels(response.data))
@@ -59,12 +92,14 @@ function Notifications() {
   }
   async function open(item) {
     await API.patch(`/notifications/${item.id}/read`)
+    setItems(current => current.map(entry => (
+      entry.id === item.id ? { ...entry, is_read: 1 } : entry
+    )))
     if (item.task_id) navigate(`/tasks/${item.task_id}`)
-    else refresh()
   }
   async function readAll() {
     await API.patch('/notifications/read-all')
-    refresh()
+    setItems(current => current.map(item => ({ ...item, is_read: 1 })))
   }
   return (
     <div className="responsive-page" style={styles.page}>

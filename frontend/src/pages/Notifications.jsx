@@ -1,0 +1,112 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import API from '../api/axios'
+
+function Notifications() {
+  const [items, setItems] = useState([])
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [channels, setChannels] = useState(null)
+  const navigate = useNavigate()
+  async function refresh() {
+    try {
+      const response = await API.get('/notifications')
+      setItems(response.data)
+      setError('')
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Notifications could not be loaded')
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => { refresh() }, [])
+
+  useEffect(() => {
+    API.get('/notifications/channels').then(response => setChannels(response.data))
+  }, [])
+
+  async function enablePush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      setError('Browser push is not supported in this browser')
+      return
+    }
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      setError('Notification permission was not granted')
+      return
+    }
+    const registration = await navigator.serviceWorker.register('/sw.js')
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(channels.vapidPublicKey),
+    })
+    await API.post('/notifications/push-subscriptions', { subscription })
+    const response = await API.get('/notifications/channels')
+    setChannels(response.data)
+  }
+
+  async function disablePush() {
+    const registration = await navigator.serviceWorker.ready
+    const subscription = await registration.pushManager.getSubscription()
+    if (subscription) {
+      await API.delete('/notifications/push-subscriptions', {
+        data: { endpoint: subscription.endpoint },
+      })
+      await subscription.unsubscribe()
+    }
+    const response = await API.get('/notifications/channels')
+    setChannels(response.data)
+  }
+  async function open(item) {
+    await API.patch(`/notifications/${item.id}/read`)
+    if (item.task_id) navigate(`/tasks/${item.task_id}`)
+    else refresh()
+  }
+  async function readAll() {
+    await API.patch('/notifications/read-all')
+    refresh()
+  }
+  return (
+    <div style={styles.page}>
+      <div style={styles.header}><h1>Notifications</h1><button onClick={readAll}>Mark all read</button></div>
+      {channels && (
+        <div style={styles.channels}>
+          <span>Real-time popups: On</span>
+          <span>Email: {channels.emailConfigured ? 'On' : 'Needs SMTP setup'}</span>
+          <span>Browser push: {channels.pushSubscribed ? 'On' : 'Off'}</span>
+          <button onClick={channels.pushSubscribed ? disablePush : enablePush}>
+            {channels.pushSubscribed ? 'Disable browser push' : 'Enable browser push'}
+          </button>
+        </div>
+      )}
+      {error && <p style={styles.error}>{error}</p>}
+      {loading && <p>Loading notifications...</p>}
+      {!loading && !error && !items.length && <p>You have no notifications yet.</p>}
+      {items.map(item => (
+        <button key={item.id} style={{ ...styles.item, opacity: item.is_read ? 0.65 : 1 }} onClick={() => open(item)}>
+          <strong>{item.message}</strong>
+          <small>{new Date(item.created_at).toLocaleString()}</small>
+        </button>
+      ))}
+    </div>
+  )
+}
+const styles = {
+  page: { padding: '32px', minHeight: '100vh', background: '#f0f2f5' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  item: { display: 'grid', width: '100%', textAlign: 'left', gap: '6px', background: '#fff', border: 0, borderRadius: '10px', padding: '16px', marginBottom: '10px' },
+  error: { color: '#dc2626', background: '#fee2e2', padding: '12px', borderRadius: '8px' },
+  channels: {
+    display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap',
+    background: '#fff', padding: '14px', borderRadius: '10px', marginBottom: '16px',
+  },
+}
+
+function urlBase64ToUint8Array(value) {
+  const padding = '='.repeat((4 - value.length % 4) % 4)
+  const base64 = (value + padding).replaceAll('-', '+').replaceAll('_', '/')
+  const raw = atob(base64)
+  return Uint8Array.from([...raw].map(character => character.charCodeAt(0)))
+}
+
+export default Notifications

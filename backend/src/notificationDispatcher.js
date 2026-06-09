@@ -14,14 +14,55 @@ function createTransport() {
 
 const mailer = createTransport()
 
-async function deliverEmail(notification) {
-  if (!mailer) return
+const emailJsConfigured = Boolean(
+  process.env.EMAILJS_SERVICE_ID &&
+  process.env.EMAILJS_TEMPLATE_ID &&
+  process.env.EMAILJS_PUBLIC_KEY
+)
+
+const emailProvider = emailJsConfigured
+  ? 'emailjs'
+  : mailer
+    ? 'smtp'
+    : null
+
+async function sendWithEmailJs(notification) {
+  const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: process.env.EMAILJS_SERVICE_ID,
+      template_id: process.env.EMAILJS_TEMPLATE_ID,
+      user_id: process.env.EMAILJS_PUBLIC_KEY,
+      accessToken: process.env.EMAILJS_PRIVATE_KEY || undefined,
+      template_params: {
+        to_email: notification.email,
+        to_name: notification.name,
+        message: notification.message,
+        notification_type: notification.type,
+        task_id: notification.task_id || '',
+        app_url: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+      },
+    }),
+  })
+  if (!response.ok) {
+    throw new Error(`EmailJS ${response.status}: ${await response.text()}`)
+  }
+}
+
+async function sendWithSmtp(notification) {
   await mailer.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: notification.email,
     subject: 'TeamFlow notification',
     text: notification.message,
   })
+}
+
+async function deliverEmail(notification) {
+  if (!emailProvider) return
+  if (emailProvider === 'emailjs') await sendWithEmailJs(notification)
+  else await sendWithSmtp(notification)
   await db.query('UPDATE notifications SET email_sent_at = NOW() WHERE id = ?', [notification.id])
 }
 
@@ -56,7 +97,7 @@ async function deliverPush(notification) {
 
 async function dispatch() {
   const [rows] = await db.query(
-    `SELECT n.*, u.email
+    `SELECT n.*, u.email, u.name
      FROM notifications n JOIN users u ON u.id = n.user_id
      WHERE n.created_at >= NOW() - INTERVAL 1 DAY
        AND (n.email_sent_at IS NULL OR n.push_sent_at IS NULL)
@@ -66,6 +107,9 @@ async function dispatch() {
     try {
       if (!notification.email_sent_at) await deliverEmail(notification)
       if (!notification.push_sent_at) await deliverPush(notification)
+      if (emailProvider === 'emailjs') {
+        await new Promise(resolve => setTimeout(resolve, 1100))
+      }
     } catch (error) {
       console.error(`Notification delivery ${notification.id} failed:`, error.message)
     }
@@ -78,4 +122,8 @@ function startNotificationDispatcher() {
   return timer
 }
 
-module.exports = { startNotificationDispatcher, emailConfigured: Boolean(mailer) }
+module.exports = {
+  startNotificationDispatcher,
+  emailConfigured: Boolean(emailProvider),
+  emailProvider,
+}

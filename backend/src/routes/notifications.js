@@ -4,7 +4,7 @@ const db = require('../db')
 const auth = require('../middleware/auth')
 const jwt = require('jsonwebtoken')
 const { publicKey } = require('../push')
-const { emailConfigured } = require('../notificationDispatcher')
+const { emailConfigured, emailProvider } = require('../notificationDispatcher')
 
 router.get('/', auth, async (req, res) => {
   const [rows] = await db.query(
@@ -36,6 +36,7 @@ router.get('/channels', auth, async (req, res) => {
   res.json({
     realtime: true,
     emailConfigured,
+    emailProvider,
     pushConfigured: true,
     pushSubscribed: subscriptions[0].count > 0,
     vapidPublicKey: publicKey,

@@ -41,8 +41,19 @@ Open `http://localhost:5173` and sign in with the seeded lead account. Leads can
 
 - Real-time in-app popups use an authenticated Server-Sent Events connection.
 - Browser push can be enabled by each user from the Notifications page.
-- Email delivery requires the `SMTP_*` values in `backend/.env`; see `backend/.env.example`.
+- Email delivery supports EmailJS or SMTP. EmailJS is preferred when `EMAILJS_*` values are configured.
 - Local VAPID keys are generated automatically in `backend/.vapid-keys.json`.
+
+### EmailJS template variables
+
+Create an EmailJS template that uses:
+
+- `{{to_email}}`
+- `{{to_name}}`
+- `{{message}}`
+- `{{notification_type}}`
+- `{{task_id}}`
+- `{{app_url}}`
 
 ## API
 

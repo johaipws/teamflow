@@ -107,7 +107,11 @@ function Notifications() {
       {channels && (
         <div className="notification-channels" style={styles.channels}>
           <span>Real-time popups: On</span>
-          <span>Email: {channels.emailConfigured ? 'On' : 'Needs SMTP setup'}</span>
+          <span>
+            Email: {channels.emailConfigured
+              ? `On (${channels.emailProvider === 'emailjs' ? 'EmailJS' : 'SMTP'})`
+              : 'Needs EmailJS or SMTP setup'}
+          </span>
           <span>Browser push: {channels.pushSubscribed ? 'On' : 'Off'}</span>
           <button onClick={channels.pushSubscribed ? disablePush : enablePush}>
             {channels.pushSubscribed ? 'Disable browser push' : 'Enable browser push'}

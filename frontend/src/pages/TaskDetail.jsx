@@ -90,16 +90,16 @@ function TaskDetail() {
   const nextStatuses = ALLOWED_TRANSITIONS[user.role]?.[task.status] || []
 
   return (
-    <div style={styles.container}>
+    <div className="responsive-page" style={styles.container}>
       {/* Back Button */}
       <button style={styles.backBtn} onClick={() => navigate('/tasks')}>
         ← Back to Tasks
       </button>
 
-      <div style={styles.layout}>
+      <div className="task-detail-layout" style={styles.layout}>
         {/* Left - Task Details */}
-        <div style={styles.main}>
-          <div style={styles.taskHeader}>
+        <div className="task-detail-main" style={styles.main}>
+          <div className="page-header" style={styles.taskHeader}>
             <div>
               <h1 style={styles.taskTitle}>{task.title}</h1>
               <p style={styles.taskProject}>📁 {task.project_name}</p>
@@ -121,7 +121,7 @@ function TaskDetail() {
           )}
 
           {/* Meta Info */}
-          <div style={styles.metaGrid}>
+          <div className="responsive-two-column-grid" style={styles.metaGrid}>
             <div style={styles.metaBox}>
               <p style={styles.metaLabel}>Assigned To</p>
               <p style={styles.metaValue}>👤 {task.assignee_name || 'Unassigned'}</p>
@@ -154,7 +154,7 @@ function TaskDetail() {
           {/* Status Change */}
           <div style={styles.section}>
             <p style={styles.sectionLabel}>Status</p>
-            <div style={styles.statusRow}>
+            <div className="responsive-actions" style={styles.statusRow}>
               <span style={{
                 ...styles.statusBadge,
                 background: STATUS_COLORS[task.status]?.bg,
@@ -202,7 +202,7 @@ function TaskDetail() {
         </div>
 
         {/* Right - Status History */}
-        <div style={styles.sidebar}>
+        <div className="task-detail-history" style={styles.sidebar}>
           <p style={styles.sectionLabel}>Status History</p>
           {statusLogs.length === 0 ? (
             <p style={styles.empty}>No history yet</p>

@@ -91,9 +91,9 @@ function Tasks() {
   })
 
   return (
-    <div style={styles.container}>
+    <div className="responsive-page" style={styles.container}>
       {/* Header */}
-      <div style={styles.header}>
+      <div className="page-header" style={styles.header}>
         <div>
           <h1 style={styles.title}>Tasks</h1>
           <p style={styles.subtitle}>{tasks.length} total tasks</p>
@@ -106,7 +106,7 @@ function Tasks() {
       </div>
 
       {/* Filters */}
-      <div style={styles.filters}>
+      <div className="responsive-filters" style={styles.filters}>
         <select
           style={styles.filter}
           value={filterProject}
@@ -147,9 +147,9 @@ function Tasks() {
           {filtered.map(task => {
             const nextStatuses = ALLOWED_TRANSITIONS[user.role]?.[task.status] || []
             return (
-              <div key={task.id} style={styles.taskCard}>
+              <div className="responsive-task-card" key={task.id} style={styles.taskCard}>
                 {/* Top row */}
-                <div style={styles.taskTop}>
+                <div className="task-card-top-row" style={styles.taskTop}>
                   <div style={styles.taskLeft}>
                     <span style={{
                       ...styles.priorityDot,
@@ -180,8 +180,8 @@ function Tasks() {
                 )}
 
                 {/* Bottom row */}
-                <div style={styles.taskBottom}>
-                  <div style={styles.taskMeta}>
+                <div className="task-card-bottom-row" style={styles.taskBottom}>
+                  <div className="task-card-meta" style={styles.taskMeta}>
                     {task.assignee_name && (
                       <span style={styles.metaItem}>👤 {task.assignee_name}</span>
                     )}
@@ -194,7 +194,7 @@ function Tasks() {
                   </div>
 
                   {/* Actions */}
-                  <div style={styles.actions}>
+                  <div className="task-card-actions" style={styles.actions}>
                     {nextStatuses.length > 0 && (
                       <select
                         style={styles.statusSelect}

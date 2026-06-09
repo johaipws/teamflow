@@ -35,7 +35,7 @@ function TaskCollaboration({ taskId }) {
   }
 
   return (
-    <div style={styles.grid}>
+    <div className="responsive-two-column-grid" style={styles.grid}>
       <section>
         <h3 style={styles.title}>Comments</h3>
         <form onSubmit={addComment} style={styles.form}>

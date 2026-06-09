@@ -10,13 +10,13 @@ function Reports() {
       .then(response => setReport(response.data))
       .catch(requestError => setError(requestError.response?.data?.message || 'Reports could not be loaded'))
   }, [])
-  if (error) return <div style={styles.page}><h1>KPI Reports</h1><p style={styles.error}>{error}</p></div>
-  if (!report) return <div style={styles.page}>Loading reports...</div>
+  if (error) return <div className="responsive-page" style={styles.page}><h1>KPI Reports</h1><p style={styles.error}>{error}</p></div>
+  if (!report) return <div className="responsive-page" style={styles.page}>Loading reports...</div>
 
   return (
-    <div style={styles.page}>
+    <div className="responsive-page" style={styles.page}>
       <h1>{user.role === 'lead' ? 'Organization KPI Reports' : 'My KPI Report'}</h1>
-      <div style={styles.cards}>
+      <div className="responsive-stats" style={styles.cards}>
         <Metric label="Total tasks" value={report.summary.total || 0} />
         <Metric label="Completed" value={report.summary.completed || 0} />
         <Metric label="Overdue" value={report.summary.overdue || 0} />
@@ -44,7 +44,7 @@ function Metric({ label, value }) {
   return <div style={styles.card}><small>{label}</small><strong>{value}</strong></div>
 }
 function Row({ name, value }) {
-  return <div style={styles.row}><span>{name}</span><strong>{value}</strong></div>
+  return <div className="responsive-row" style={styles.row}><span>{name}</span><strong>{value}</strong></div>
 }
 const styles = {
   page: { padding: '32px', minHeight: '100vh', background: '#f0f2f5', color: '#1e1b4b' },

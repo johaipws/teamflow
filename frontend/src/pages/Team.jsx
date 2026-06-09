@@ -55,7 +55,7 @@ function Team() {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="responsive-page" style={styles.container}>
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>Team</h1>
@@ -63,7 +63,7 @@ function Team() {
         </div>
       </div>
 
-      <div style={styles.grid}>
+      <div className="team-layout" style={styles.grid}>
         <section style={styles.card}>
           <h2 style={styles.sectionTitle}>Add team member</h2>
           {error && <p style={styles.error}>{error}</p>}
@@ -119,7 +119,7 @@ function Team() {
         <section style={styles.card}>
           <h2 style={styles.sectionTitle}>Members</h2>
           {users.map(user => (
-            <div style={styles.member} key={user.id}>
+            <div className="team-member-row" style={styles.member} key={user.id}>
               <div>
                 <p style={styles.memberName}>{user.name}</p>
                 <p style={styles.memberEmail}>{user.email}</p>

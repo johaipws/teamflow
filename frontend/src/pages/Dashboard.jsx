@@ -33,13 +33,13 @@ function Dashboard() {
   }
 
   return (
-    <div style={styles.main}>
-      <div style={styles.header}>
+    <div className="responsive-page" style={styles.main}>
+      <div className="page-header" style={styles.header}>
         <h1 style={styles.welcome}>Welcome back, {user.name} 👋</h1>
         <span style={styles.role}>{user.role?.toUpperCase()}</span>
       </div>
 
-      <div style={styles.stats}>
+      <div className="responsive-stats" style={styles.stats}>
         {[
           { label: 'Total Tasks', value: stats.total },
           { label: 'In Progress', value: stats.in_progress },
@@ -59,7 +59,7 @@ function Dashboard() {
           <p style={styles.empty}>No tasks yet. Create your first task!</p>
         ) : (
           recentTasks.map(task => (
-            <div key={task.id} style={styles.taskRow}>
+            <div className="responsive-row" key={task.id} style={styles.taskRow}>
               <div>
                 <p style={styles.taskTitle}>{task.title}</p>
                 <p style={styles.taskSub}>📁 {task.project_name} · 👤 {task.assignee_name || 'Unassigned'}</p>

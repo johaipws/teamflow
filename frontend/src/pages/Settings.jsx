@@ -18,8 +18,8 @@ function Settings() {
     }
   }
   return (
-    <div style={styles.page}>
-      <form style={styles.card} onSubmit={submit}>
+    <div className="responsive-page" style={styles.page}>
+      <form className="settings-card" style={styles.card} onSubmit={submit}>
         <h1>Settings</h1>
         <h2>Change password</h2>
         <p>Use your current login password, then choose a new password of at least 8 characters.</p>

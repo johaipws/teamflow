@@ -91,7 +91,7 @@ const handleStop = async () => {
   return (
     <div style={styles.container}>
       {/* Timer Display */}
-      <div style={styles.timerBox}>
+      <div className="timer-box" style={styles.timerBox}>
         <div style={styles.timerDisplay}>
           <span style={{
             ...styles.timerText,
@@ -125,7 +125,7 @@ const handleStop = async () => {
         <div style={styles.logs}>
           <p style={styles.logsTitle}>Time Log History</p>
           {logs.map(log => (
-            <div key={log.id} style={styles.logItem}>
+            <div className="timer-log-row" key={log.id} style={styles.logItem}>
               <span style={styles.logUser}>👤 {log.user_name}</span>
               <span style={styles.logDate}>
                 {new Date(log.started_at).toLocaleDateString()}

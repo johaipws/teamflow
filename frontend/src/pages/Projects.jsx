@@ -52,11 +52,11 @@ function Projects() {
   }
 
   return (
-    <div style={styles.page}>
+    <div className="responsive-page" style={styles.page}>
       <h1 style={styles.heading}>Projects</h1>
       {error && <p style={styles.error}>{error}</p>}
       {user.role === 'lead' && (
-        <form style={styles.form} onSubmit={createProject}>
+        <form className="responsive-project-form" style={styles.form} onSubmit={createProject}>
           <input placeholder="Project name" value={form.name}
             onChange={event => setForm({ ...form, name: event.target.value })} required />
           <input placeholder="Description" value={form.description}
@@ -64,7 +64,7 @@ function Projects() {
           <button style={styles.button}>Create project</button>
         </form>
       )}
-      <div style={styles.grid}>
+      <div className="responsive-card-grid" style={styles.grid}>
         {loading && <p>Loading projects...</p>}
         {!loading && !projects.length && <p>No projects yet.</p>}
         {projects.map(project => (

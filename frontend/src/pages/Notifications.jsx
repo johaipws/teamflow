@@ -67,10 +67,10 @@ function Notifications() {
     refresh()
   }
   return (
-    <div style={styles.page}>
-      <div style={styles.header}><h1>Notifications</h1><button onClick={readAll}>Mark all read</button></div>
+    <div className="responsive-page" style={styles.page}>
+      <div className="page-header"><h1>Notifications</h1><button onClick={readAll}>Mark all read</button></div>
       {channels && (
-        <div style={styles.channels}>
+        <div className="notification-channels" style={styles.channels}>
           <span>Real-time popups: On</span>
           <span>Email: {channels.emailConfigured ? 'On' : 'Needs SMTP setup'}</span>
           <span>Browser push: {channels.pushSubscribed ? 'On' : 'Off'}</span>

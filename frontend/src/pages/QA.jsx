@@ -63,7 +63,7 @@ function QA() {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="responsive-page" style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
         <div>
@@ -72,9 +72,9 @@ function QA() {
         </div>
       </div>
 
-      <div style={styles.layout}>
+      <div className="qa-layout" style={styles.layout}>
         {/* Task List */}
-        <div style={styles.list}>
+        <div className="qa-task-list" style={styles.list}>
           {loading ? (
             <p style={styles.empty}>Loading...</p>
           ) : tasks.length === 0 ? (
@@ -117,7 +117,7 @@ function QA() {
 
         {/* Review Panel */}
         {selectedTask && (
-          <div style={styles.panel}>
+          <div className="qa-review-panel" style={styles.panel}>
             <h2 style={styles.panelTitle}>{selectedTask.title}</h2>
             <p style={styles.panelProject}>📁 {selectedTask.project_name}</p>
 
@@ -128,7 +128,7 @@ function QA() {
               </div>
             )}
 
-            <div style={styles.metaGrid}>
+            <div className="responsive-three-column-grid" style={styles.metaGrid}>
               <div style={styles.metaBox}>
                 <p style={styles.metaLabel}>Assigned To</p>
                 <p style={styles.metaValue}>👤 {selectedTask.assignee_name || 'Unassigned'}</p>
@@ -180,7 +180,7 @@ function QA() {
                 value={comment}
                 onChange={e => setComment(e.target.value)}
               />
-              <div style={styles.reviewBtns}>
+              <div className="responsive-actions" style={styles.reviewBtns}>
                 <button
                   style={styles.failBtn}
                   onClick={() => handleReview('fail')}
@@ -202,7 +202,7 @@ function QA() {
 
         {/* No task selected */}
         {!selectedTask && tasks.length > 0 && (
-          <div style={styles.noSelect}>
+          <div className="qa-no-selection" style={styles.noSelect}>
             <p style={styles.noSelectIcon}>👈</p>
             <p style={styles.noSelectText}>Select a task to review</p>
           </div>

@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import RealtimeNotifications from './RealtimeNotifications'
 
 function Layout() {
   const navigate = useNavigate()
   const location = useLocation()
+  const [menuOpen, setMenuOpen] = useState(false)
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   const navItems = [
     { path: '/dashboard', label: 'Dashboard' },
@@ -24,11 +26,37 @@ function Layout() {
     navigate('/login')
   }
 
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname])
+
   return (
-    <div style={styles.container}>
-      <aside style={styles.sidebar}>
+    <div className="app-layout" style={styles.container}>
+      <header className="mobile-header">
+        <button
+          className="mobile-menu-button"
+          type="button"
+          aria-label="Open navigation"
+          onClick={() => setMenuOpen(true)}
+        >
+          Menu
+        </button>
+        <strong>TeamFlow</strong>
+        <span>{user.role}</span>
+      </header>
+      {menuOpen && (
+        <button
+          className="mobile-nav-backdrop"
+          aria-label="Close navigation"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+      <aside className={`app-sidebar ${menuOpen ? 'open' : ''}`} style={styles.sidebar}>
         <div>
-          <h2 style={styles.logo}>TeamFlow</h2>
+          <div className="sidebar-title-row">
+            <h2 style={styles.logo}>TeamFlow</h2>
+            <button className="mobile-close-button" onClick={() => setMenuOpen(false)}>Close</button>
+          </div>
           <nav>
             {navItems.map(item => (
               <button
@@ -54,7 +82,7 @@ function Layout() {
           <button style={styles.logout} onClick={handleLogout}>Logout</button>
         </div>
       </aside>
-      <main style={styles.main}>
+      <main className="app-main" style={styles.main}>
         <Outlet />
       </main>
       <RealtimeNotifications />

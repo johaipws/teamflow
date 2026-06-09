@@ -44,6 +44,7 @@ function RealtimeNotifications() {
   if (!toast) return null
   return (
     <button
+      className="realtime-toast"
       style={styles.toast}
       onClick={() => {
         if (toast.task_id) navigate(`/tasks/${toast.task_id}`)

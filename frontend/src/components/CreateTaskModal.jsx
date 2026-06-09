@@ -69,8 +69,8 @@ function CreateTaskModal({ onClose, onTaskCreated }) {
   const qas = users.filter(u => u.role === 'qa' || u.role === 'lead')
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
+    <div className="modal-overlay" style={styles.overlay}>
+      <div className="responsive-modal" style={styles.modal}>
         <div style={styles.modalHeader}>
           <h2 style={styles.modalTitle}>Create New Task</h2>
           <button style={styles.closeBtn} onClick={onClose}>✕</button>
@@ -147,7 +147,7 @@ function CreateTaskModal({ onClose, onTaskCreated }) {
           </div>
 
           {/* Two columns */}
-          <div style={styles.grid}>
+          <div className="responsive-two-column-grid" style={styles.grid}>
             {/* Assign To */}
             <div style={styles.field}>
               <label style={styles.label}>Assign To</label>
